@@ -31,6 +31,8 @@ struct PLAYER_NAME : public Player {
    return false;
   }
 
+  /*
+
   inline bool check_farmer(Pos pos) {
     Cell c = cell(pos);
     if (c.type == Wall)
@@ -50,6 +52,83 @@ struct PLAYER_NAME : public Player {
       return true;
     else
       return false;
+  }
+
+
+  */
+  
+   inline bool check_farmer(Pos pos,UnitType unitType, int health) {
+
+    if (unitType == Farmer) {
+      Cell c = cell(pos);
+      if (c.type == Wall)
+        return false;
+      if (c.haunted)
+        return false;
+      if (c.id != -1)
+        return false;
+      if (knighted(pos))
+        return false;
+      return true;
+    }
+    else if (unitType == Knight){
+      //return false;
+      Cell c = cell(pos);
+      if (c.type == Wall)
+        return false;
+      if (c.haunted)
+        return false;
+      if (c.id != -1) {
+        Unit u = unit(c.id);
+        if (u.player == 0)
+          return false;
+        if (u.type == Witch)
+          return false;
+        /*if (u.type == Knight) 
+          return false;
+        if (u.type == Farmer) 
+          return true;*/
+
+      }
+      if (knighted(pos) and health < 100)
+        return false;
+      return true;
+    }
+    else
+      return false;
+  }
+  
+  inline bool check_targetable(Pos pos,UnitType unitType, int health) {
+    if (unitType == Farmer) {
+    Cell c = cell(pos);
+    if (c.owner != 0)
+      return true;
+    else
+      return false;
+    }
+    else if (unitType == Knight) {
+      Cell c = cell(pos);
+      if (c.id != -1) {
+        Unit u = unit(c.id);
+        if (u.player == 0)
+          return false;
+        else {
+          if (u.type == Farmer)
+            return true;
+          else if (u.type == Knight) {
+            if (health > u.health)
+              return true;
+            else
+              return false;
+          }
+          else
+            return false;
+        }
+      }
+      else
+        return false;
+    }
+    return false;
   }
 
  /*inline bool check_knight_targetable(Pos pos) {
@@ -125,6 +204,8 @@ struct PLAYER_NAME : public Player {
     command(id,None);
     return false;
   }*/
+
+  /*
   inline bool bfs_farmer(int id) {
     Unit u = unit(id);
     queue<Pos> q;
@@ -175,7 +256,7 @@ struct PLAYER_NAME : public Player {
     }
     command(id,None);
     return false;
-  }  
+  }*/  
 /*
     inline bool bfs_knight(int id) {
     Unit u = unit(id);
@@ -245,6 +326,107 @@ struct PLAYER_NAME : public Player {
     return false;
   }  
 */
+
+  void log(int id, UnitType unitType, int health) {
+    cerr << "Sóc " << id << endl;
+    for (int i = 0; i < 37; i++) {
+      for (int j = 0; j < 37; j++) {
+        Cell c = cell(i,j);
+        if (c.id == id)
+          cerr << "X ";
+        else {
+          Pos pos(i,j);
+          bool cf = check_farmer(pos,unitType,health);
+          bool ct = check_targetable(pos,unitType,health);
+          if (cf and ct) cerr << "2 ";
+          else if (cf and not ct) cerr << "1 ";
+          else if (not cf and not ct) cerr << "0 ";
+          else cerr << "W ";
+        }
+      }
+      cerr << endl;
+    }
+  }
+
+  inline bool bfs_farmer(int id) {
+    Unit u = unit(id);
+
+    queue<Pos> q;
+    q.push(u.pos);
+    map<Pos,Pos> m; // path: key child, info parent
+    m.insert(make_pair(u.pos,u.pos));
+    int c = 0;
+    set<Pos> s_visited;
+    UnitType unitType = u.type;
+    int n = 0;
+    if (u.type == Farmer)
+      n = 4;
+    else if (u.type == Knight)
+      n = 8;
+    while (not q.empty()) {
+      if (q.size() > 6000) log(id,unitType,u.health);
+      //cerr << id << " " << q.size() << endl;
+      Pos pos = q.front(); 
+      s_visited.insert(pos);
+      q.pop();
+      for(int i = 0; i < n; i++) {
+        if (check_farmer(pos+farmer_movements[i],unitType,u.health)) {
+        //if (check_farmer(pos+farmer_movements[i])) {
+          if (check_targetable(pos+farmer_movements[i],unitType,u.health)) {
+            cerr << id << " DINS" << endl;
+          //if (check_targetable(pos+farmer_movements[i])) {
+            //FOUND
+            m.insert(make_pair(pos+farmer_movements[i],pos));
+            Pos pos_dir = pos+farmer_movements[i];
+            Pos pos_aux;
+            while (pos_dir != u.pos) {
+              pos_aux = pos_dir;
+              pos_dir = m[pos_dir];
+            }
+            if (u.pos+Left == pos_aux) {
+              command(id,Left);
+            }
+            else if (u.pos+Top == pos_aux) {
+              command(id,Top);
+            }
+            else if (u.pos+Right == pos_aux) {
+              command(id,Right);
+            }
+            else if (u.pos+Bottom == pos_aux) {
+              command(id,Bottom);
+            }
+            else if (unitType == Knight) {
+              if (u.pos+BR == pos_aux) {
+                command(id,BR);
+              }
+              else if (u.pos+RT == pos_aux) {
+                command(id,RT);
+              }
+              else if (u.pos+TL == pos_aux) {
+                command(id,TL);
+              }
+              else if (u.pos+LB == pos_aux) {
+                command(id,LB);
+              }
+            }
+            return true;
+          }
+          else {
+            // if (m.find(pos+farmer_movements[i]) == m.end()) {
+            if (s_visited.find(pos+farmer_movements[i]) == s_visited.end()) {
+              s_visited.insert(pos+farmer_movements[i]); // no necessari pels farmers, sí pels knights
+              q.push(pos+farmer_movements[i]);
+              m.insert(make_pair(pos+farmer_movements[i],pos));
+            }
+          }
+        }
+      }
+    }
+    command(id,None);
+    return false;
+  }
+
+
   /**
    * Types and attributes for your player can be defined here.
    */
@@ -252,7 +434,9 @@ struct PLAYER_NAME : public Player {
   vector<int> f;
   vector<int> k;
   Dir knight_movements[8] = {Bottom,BR,Right,RT,Top,TL,Left,LB};
-  Dir farmer_movements[4] = {Left,Top,Right,Bottom};
+  //Dir farmer_movements[4] = {Left,Top,Right,Bottom};
+  //Dir farmer_movements[4] = {Left,Top,Right,Bottom};
+  Dir farmer_movements[8] = {Left,Top,Right,Bottom,BR,RT,TL,LB};
 
   /**
    * Play method, invoked once per each round.
@@ -262,9 +446,11 @@ struct PLAYER_NAME : public Player {
     f = farmers(0);
     for (int i = 0; i < f.size(); i++)
         bfs_farmer(f[i]);
-    /*k = knights(0);
+    k = knights(0);
     for (int i = 0; i < k.size(); i++)
-        bfs_knight(f[i]);*/
+        bfs_farmer(k[i]);
+    /*k = knights(0);
+    bfs_farmer(k[0]);*/
 
   }
 
