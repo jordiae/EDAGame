@@ -250,8 +250,8 @@ struct PLAYER_NAME : public Player {
       }
       //int health_en;
       //if (knighted2(pos,health_en) and 1.5*health < health_en)
-      if (knighted(pos) and health < 80)
-        return false;
+      /*if (knighted(pos) and health < 60)
+        return false;*/
       return true;
     }
     else if (unitType == Witch) {
@@ -266,9 +266,12 @@ struct PLAYER_NAME : public Player {
           return false;
         return true;
       }
-      if (self_haunted(pos) > 4) {
+      if (self_haunted(pos) > 1 and round() > 20) { // (abans self_haunted > 0) ROUND: clauissim!!! > 20
         return false;
       }
+      /*if (self_haunted(pos) > 5 and round() <= 20) {
+        return false;
+      }*/
       return true;
     }
     
@@ -294,10 +297,11 @@ struct PLAYER_NAME : public Player {
           if (u.type == Farmer)
             return true;
           else if (u.type == Knight) {
-            if (health > u.health)
+            return true;
+           /*if (health > u.health)
               return true;
             else
-              return false;
+              return false;*/
           }
           else
             return false;
@@ -307,7 +311,7 @@ struct PLAYER_NAME : public Player {
         return false;
     }
     else if (unitType == Witch) {
-      Cell c = cell(pos);
+      /*Cell c = cell(pos);
       if (c.id != -1) {
         Unit u = unit(c.id);
         if (u.player == 0)
@@ -316,12 +320,18 @@ struct PLAYER_NAME : public Player {
           return false;
         else if (u.type == Knight)
           return true;
-        else if (u.type == Farmer)
-          return true;
-        else
-          return true;
-      }
-      if (other_haunted(pos) > 0)
+        
+        //else if (u.type == Farmer)
+          //return true;
+        //else
+          //return true;
+          
+      }*/
+      /*if (round() <= 40 and other_haunted(pos) > 4)
+        return true;*/
+      /*if (round() > 40 and other_haunted(pos) > 0)
+        return true;*/
+      if (other_haunted(pos) > 1) // > = 0 ?
         return true;
     }
     return false;
@@ -547,10 +557,10 @@ struct PLAYER_NAME : public Player {
   inline bool bfs_farmer(int id) {
     Unit u = unit(id);
     if (u.type != Witch) {
-      if (u.type == Farmer and u.health < 40) {
+      /*if (u.type == Farmer and u.health < 40) {
         command(id,None);
         return false;
-      }
+      }*/
       if (u.type == Knight and u.health < 20) {
         command(id,None);
         return false;
