@@ -75,6 +75,64 @@ struct PLAYER_NAME : public Player {
     }
     return damage;
   }
+
+    inline int other_haunted(Pos pos) {
+    int damage = 0;
+    for (int i = 0; i < 8; i++) {
+      Cell c = cell(pos+farmer_movements[i]);
+      if (c.id != -1) {
+        Unit u = unit(c.id);
+        if (u.player != 0 and u.type != Witch) {
+          if (u.type == Farmer)
+            damage += 1;
+          else if (u.type == Knight)
+            damage += 2;
+        }
+      }
+    }
+    Cell c = cell(pos+Left+Left);
+    Unit u;
+    if (c.id != -1) {
+      u = unit (c.id);
+      if (u.player != 0 and u.type != Witch) {
+        if (u.type == Farmer)
+          damage += 1;
+        else if (u.type == Knight)
+          damage += 2;
+      }
+    }
+    c = cell(pos+Top+Top);
+    if (c.id != -1) {
+      u = unit (c.id);
+      if (u.player != 0 and u.type != Witch) {
+        if (u.type == Farmer)
+          damage += 1;
+        else if (u.type == Knight)
+          damage += 2;
+      }
+    }
+    c = cell(pos+Right+Right);
+    if (c.id != -1) {
+      u = unit (c.id);
+      if (u.player != 0 and u.type != Witch) {
+        if (u.type == Farmer)
+          damage += 1;
+        else if (u.type == Knight)
+          damage += 2;
+      }
+    }
+    c = cell(pos+Bottom+Bottom);
+    if (c.id != -1) {
+      u = unit (c.id);
+      if (u.player != 0 and u.type != Witch) {
+        if (u.type == Farmer)
+          damage += 1;
+        else if (u.type == Knight)
+          damage += 2;
+      }
+    }
+    return damage;
+  }
 /*
   inline bool self_haunted(Pos pos) {
     for (int i = 0; i < 8; i++) {
@@ -184,16 +242,16 @@ struct PLAYER_NAME : public Player {
           return false;
         if (u.type == Witch)
           return false;
-        /*if (u.type == Knight) 
-          return false;
+        if (u.type == Knight) 
+          return true;
         if (u.type == Farmer) 
-          return true;*/
+          return true;
 
       }
       //int health_en;
       //if (knighted2(pos,health_en) and 1.5*health < health_en)
-      /*if (knighted(pos) and health < 80)
-        return false;*/
+      if (knighted(pos) and health < 80)
+        return false;
       return true;
     }
     else if (unitType == Witch) {
@@ -263,7 +321,8 @@ struct PLAYER_NAME : public Player {
         else
           return true;
       }
-      return false;
+      if (other_haunted(pos) > 0)
+        return true;
     }
     return false;
   }
@@ -487,8 +546,8 @@ struct PLAYER_NAME : public Player {
 
   inline bool bfs_farmer(int id) {
     Unit u = unit(id);
-    /*if (u.type != Witch) {
-      if (u.type == Farmer and u.health < 80) {
+    if (u.type != Witch) {
+      if (u.type == Farmer and u.health < 40) {
         command(id,None);
         return false;
       }
@@ -496,7 +555,7 @@ struct PLAYER_NAME : public Player {
         command(id,None);
         return false;
       }
-    }*/
+    }
     queue<Pos> q;
     q.push(u.pos);
     map<Pos,Pos> m; // path: key child, info parent
@@ -505,10 +564,23 @@ struct PLAYER_NAME : public Player {
     set<Pos> s_visited;
     UnitType unitType = u.type;
     int n = 0;
-    if (u.type == Farmer or u.type == Witch)
+    vector<Dir> mov(8);
+    if (u.type == Farmer or u.type == Witch) {
       n = 4;
-    else if (u.type == Knight)
+      vector<Dir> mov_aux(n);
+      for (int i = 0; i < n; i++)
+        mov_aux[i] = farmer_movements[i];
+      vector<int> randp = random_permutation(n);
+      for (int i = 0; i < n; i++)
+        mov[randp[i]] = mov_aux[i];
+    }
+    else if (u.type == Knight) {
       n = 8;
+      vector<int> randp = random_permutation(n);
+      for (int i = 0; i < n; i++)
+        mov[randp[i]] = farmer_movements[i];
+
+    }
     while (not q.empty()) {
       //if (q.size() > 6000) log(id,unitType,u.health);
       //cerr << id << " " << q.size() << endl;
@@ -516,13 +588,13 @@ struct PLAYER_NAME : public Player {
       s_visited.insert(pos);
       q.pop();
       for(int i = 0; i < n; i++) {
-        if (check_farmer(pos+farmer_movements[i],unitType,u.health)) {
+        if (check_farmer(pos+mov[i],unitType,u.health)) {
         //if (check_farmer(pos+farmer_movements[i])) {
-          if (check_targetable(pos+farmer_movements[i],unitType,u.health)) {
+          if (check_targetable(pos+mov[i],unitType,u.health)) {
           //if (check_targetable(pos+farmer_movements[i])) {
             //FOUND
-            m.insert(make_pair(pos+farmer_movements[i],pos));
-            Pos pos_dir = pos+farmer_movements[i];
+            m.insert(make_pair(pos+mov[i],pos));
+            Pos pos_dir = pos+mov[i];
             Pos pos_aux;
             while (pos_dir != u.pos) {
               pos_aux = pos_dir;
@@ -558,10 +630,10 @@ struct PLAYER_NAME : public Player {
           }
           else {
             // if (m.find(pos+farmer_movements[i]) == m.end()) {
-            if (s_visited.find(pos+farmer_movements[i]) == s_visited.end()) {
-              s_visited.insert(pos+farmer_movements[i]); // no necessari pels farmers, sí pels knights
-              q.push(pos+farmer_movements[i]);
-              m.insert(make_pair(pos+farmer_movements[i],pos));
+            if (s_visited.find(pos+mov[i]) == s_visited.end()) {
+              s_visited.insert(pos+mov[i]); // no necessari pels farmers, sí pels knights
+              q.push(pos+mov[i]);
+              m.insert(make_pair(pos+mov[i],pos));
             }
           }
         }
@@ -616,6 +688,7 @@ struct PLAYER_NAME : public Player {
     for (int i = 0; i < k.size(); i++)
         bfs_farmer(k[i]);
     w = witches(0);
+
     /*if (round() < 5) {
       for (int i = 0; i < w.size(); i++)
         witch_initial_movement(w[i]);
