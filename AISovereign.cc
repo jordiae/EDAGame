@@ -18,6 +18,20 @@ struct PLAYER_NAME : public Player {
     return new PLAYER_NAME;
   }
 
+  inline bool extra_haunted(Pos pos) {
+    Cell c = cell(pos);
+    if (c.haunted) {
+      return true;
+    }
+    for (int i = 0; i < 8; i++) {
+      Pos pos_aux = pos+farmer_movements[i];
+      c = cell(pos_aux);
+      if (c.haunted)
+        return true;
+    }
+    return false;
+  }
+
   inline int self_haunted(Pos pos) {
     int damage = 0;
     for (int i = 0; i < 8; i++) {
@@ -188,6 +202,60 @@ struct PLAYER_NAME : public Player {
    return false;
   }
 
+
+  inline bool check_farmer_escape(Pos pos,UnitType unitType, int health) {
+    if (unitType == Farmer) {
+      Cell c = cell(pos);
+      if (c.type == Wall)
+        return false;
+      if (c.haunted)
+        return false;
+      /*if (extra_haunted(pos)) // !
+        return false;*/
+      if (c.id != -1)
+        return false;
+      /*if (knighted(pos))
+        return false;*/
+      return true;
+    }
+    else if (unitType == Knight){
+      //return false;
+      Cell c = cell(pos);
+      if (c.type == Wall)
+        return false;
+      if (c.haunted)
+        return false;
+      /*if (extra_haunted(pos)) // !
+        return false;*/
+      if (c.id != -1) {
+        Unit u = unit(c.id);
+        if (u.player == 0)
+          return false;
+        if (u.type == Witch)
+          return false;
+        if (u.type == Knight) 
+          return false;
+        if (u.type == Farmer) 
+          return true;
+
+      }
+      //int health_en;
+      //if (knighted2(pos,health_en) and 1.5*health < health_en)
+      /*if (knighted(pos) and health < 60)
+        return false;*/
+      return true;
+    }
+  }
+
+  inline bool check_targetable_escape(Pos pos,UnitType unitType, int health) {
+    /*if (not extra_haunted(pos) and not knighted(pos))
+      return true;*/
+    Cell c = cell(pos);
+    if (not c.haunted)
+      return true;
+    else return false;
+  }
+
   /*
 
   inline bool check_farmer(Pos pos) {
@@ -213,6 +281,10 @@ struct PLAYER_NAME : public Player {
 
 
   */
+
+
+
+
   
 
 
@@ -222,6 +294,8 @@ struct PLAYER_NAME : public Player {
       if (c.type == Wall)
         return false;
       if (c.haunted)
+        return false;
+      if (extra_haunted(pos)) // !
         return false;
       if (c.id != -1)
         return false;
@@ -235,6 +309,8 @@ struct PLAYER_NAME : public Player {
       if (c.type == Wall)
         return false;
       if (c.haunted)
+        return false;
+      if (extra_haunted(pos)) // !
         return false;
       if (c.id != -1) {
         Unit u = unit(c.id);
@@ -266,7 +342,7 @@ struct PLAYER_NAME : public Player {
           return false;
         return true;
       }
-      if (self_haunted(pos) > 1 and round() > 20) { // (abans self_haunted > 0) ROUND: clauissim!!! > 20
+      if (self_haunted(pos) > 1 and round() > 20) { // (abans self_haunted > 0) ROUND: clauissim!!! > 20 EP EP
         return false;
       }
       /*if (self_haunted(pos) > 5 and round() <= 20) {
@@ -568,6 +644,7 @@ struct PLAYER_NAME : public Player {
     }
     queue<Pos> q;
     q.push(u.pos);
+
     map<Pos,Pos> m; // path: key child, info parent
     m.insert(make_pair(u.pos,u.pos));
     int c = 0;
@@ -649,9 +726,21 @@ struct PLAYER_NAME : public Player {
         }
       }
     }
-    command(id,None);
+    bool b;
+    if (extra_haunted(u.pos) or knighted(u.pos)) {
+      cerr << "YEP" << endl;
+      b = bfs_escape(id);
+    }
+    
+    cerr << "Sóc " << id << " a la ronda " << round() << " i sóc " << u.type << endl;
+    if (not b)
+      command(id,None);
     return false;
   }
+
+
+
+
 
   bool witch_initial_movement(int id) {
     Unit u = unit(id);
@@ -672,6 +761,114 @@ struct PLAYER_NAME : public Player {
         return false;
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+    inline bool bfs_escape(int id) {
+    Unit u = unit(id);
+    queue<Pos> q;
+    q.push(u.pos);
+
+    map<Pos,Pos> m; // path: key child, info parent
+    m.insert(make_pair(u.pos,u.pos));
+    int c = 0;
+    set<Pos> s_visited;
+    UnitType unitType = u.type;
+    int n = 0;
+    vector<Dir> mov(8);
+    if (u.type == Farmer or u.type == Witch) {
+      n = 4;
+      vector<Dir> mov_aux(n);
+      for (int i = 0; i < n; i++)
+        mov_aux[i] = farmer_movements[i];
+      vector<int> randp = random_permutation(n);
+      for (int i = 0; i < n; i++)
+        mov[randp[i]] = mov_aux[i];
+    }
+    else if (u.type == Knight) {
+      n = 8;
+      vector<int> randp = random_permutation(n);
+      for (int i = 0; i < n; i++)
+        mov[randp[i]] = farmer_movements[i];
+
+    }
+    while (not q.empty()) {
+      //if (q.size() > 6000) log(id,unitType,u.health);
+      //cerr << id << " " << q.size() << endl;
+      Pos pos = q.front(); 
+      s_visited.insert(pos);
+      q.pop();
+      for(int i = 0; i < n; i++) {
+        if (check_farmer_escape(pos+mov[i],unitType,u.health)) {
+        //if (check_farmer(pos+farmer_movements[i])) {
+          if (check_targetable_escape(pos+mov[i],unitType,u.health)) {
+          //if (check_targetable(pos+farmer_movements[i])) {
+            //FOUND
+            m.insert(make_pair(pos+mov[i],pos));
+            Pos pos_dir = pos+mov[i];
+            Pos pos_aux;
+            while (pos_dir != u.pos) {
+              pos_aux = pos_dir;
+              pos_dir = m[pos_dir];
+            }
+            if (u.pos+Left == pos_aux) {
+              command(id,Left);
+            }
+            else if (u.pos+Top == pos_aux) {
+              command(id,Top);
+            }
+            else if (u.pos+Right == pos_aux) {
+              command(id,Right);
+            }
+            else if (u.pos+Bottom == pos_aux) {
+              command(id,Bottom);
+            }
+            else if (unitType == Knight) {
+              if (u.pos+BR == pos_aux) {
+                command(id,BR);
+              }
+              else if (u.pos+RT == pos_aux) {
+                command(id,RT);
+              }
+              else if (u.pos+TL == pos_aux) {
+                command(id,TL);
+              }
+              else if (u.pos+LB == pos_aux) {
+                command(id,LB);
+              }
+            }
+            return true;
+          }
+          else {
+            // if (m.find(pos+farmer_movements[i]) == m.end()) {
+            if (s_visited.find(pos+mov[i]) == s_visited.end()) {
+              s_visited.insert(pos+mov[i]); // no necessari pels farmers, sí pels knights
+              q.push(pos+mov[i]);
+              m.insert(make_pair(pos+mov[i],pos));
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+
+
+
+
+
+
+
+
 
 
   /**
