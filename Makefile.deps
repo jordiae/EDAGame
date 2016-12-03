@@ -4,6 +4,18 @@ AINull.o: AINull.cc Player.hh Info.hh Settings.hh Structs.hh Utils.hh \
  State.hh Action.hh Random.hh Registry.hh
 AISovereign.o: AISovereign.cc Player.hh Info.hh Settings.hh Structs.hh \
  Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignDFS.o: AISovereignDFS.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignTest.o: AISovereignTest.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv5.o: AISovereignv5.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv6.o: AISovereignv6.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv7.o: AISovereignv7.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereingv3.o: AISovereingv3.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 Action.o: Action.cc Action.hh Structs.hh Utils.hh
 Board.o: Board.cc Board.hh Info.hh Settings.hh Structs.hh Utils.hh \
  State.hh Action.hh Random.hh
@@ -20,4 +32,9 @@ Settings.o: Settings.cc Settings.hh Structs.hh Utils.hh
 State.o: State.cc State.hh Structs.hh Utils.hh
 Structs.o: Structs.cc Structs.hh Utils.hh
 Utils.o: Utils.cc Utils.hh
+program.o: program.cc Player.hh Info.hh Settings.hh Structs.hh Utils.hh \
+ State.hh Action.hh Random.hh Registry.hh
+stats.o: stats.cc
 test.o: test.cc
+test2.o: test2.cc
+test5.o: test5.cc

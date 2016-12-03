@@ -1,0 +1,1 @@
+g++ -std=c++11 -Wall -Wno-unused-variable    -O2   -c -o AISovereignv2.o AISovereignv2.cc
