@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME Sovereignv6
+#define PLAYER_NAME Sovereignv9
 
 
 struct PLAYER_NAME : public Player {
@@ -261,7 +261,7 @@ struct PLAYER_NAME : public Player {
 
 
    inline bool check_farmer(Pos pos,UnitType unitType, int health, bool escape, bool first_pos) {
-    if ((unitType == Farmer)and already_moved.find(pos) != already_moved.end() and first_pos) {
+    if ((unitType == Farmer) or (unitType == Knight and not check_targetable(pos,unitType,health,escape))and already_moved.find(pos) != already_moved.end() and first_pos) {
       si_rep++;
       return false;
 

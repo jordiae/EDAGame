@@ -481,7 +481,7 @@ struct PLAYER_NAME : public Player {
   inline bool check_targetable(Pos pos,UnitType unitType, int health) {
     if (unitType == Farmer) {
     Cell c = cell(pos);
-    if (c.owner > 0)
+    if (c.owner != 0)
       return true;
     else
       return false;
@@ -530,8 +530,7 @@ struct PLAYER_NAME : public Player {
         return true;*/
       /*if (round() > 40 and other_haunted(pos) > 0)
         return true;*/
-      if (other_haunted(pos) > 1.5*
-other_haunted(pos)) // > = 0 ?
+      if (other_haunted(pos) > 1.5*other_haunted(pos)) // > = 0 ?
         return true;
     }
     return false;

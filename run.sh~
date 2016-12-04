@@ -1,6 +1,6 @@
 #!/bin/bash
 rm data.txt
-for (( i = 0; i < 100000; i++ )); do
+for (( i = 0; i < 40; i++ )); do
 	./script.sh >> data.txt
         ./stats < data.txt
 done

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./Game Dummy Sovereignv6 Dummy Dummy -s $RANDOM -i default.cnf -o default.res 2> >(grep -c "Sovereignv6 got top score")

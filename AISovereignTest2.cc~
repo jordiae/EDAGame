@@ -5,7 +5,7 @@
  * Write the name of your player and save this file
  * with the same name and .cc extension.
  */
-#define PLAYER_NAME SovereignT
+#define PLAYER_NAME Sovereign
 
 
 struct PLAYER_NAME : public Player {
@@ -284,130 +284,7 @@ struct PLAYER_NAME : public Player {
 
 
 
-      inline bool check_farmer_not_found(Pos pos,UnitType unitType, int health) {
-    if (unitType == Farmer) {
-      Cell c = cell(pos);
-      if (c.type == Wall)
-        return false;
-      if (c.haunted)
-        return false;
-      /*if (extra_haunted(pos))
-        return false;*/
-      if (c.id != -1)
-        return false;
-      /*if (knighted(pos))
-        return false;*/
-      return true;
-    }
-    else if (unitType == Knight){
-      //return false;
-      Cell c = cell(pos);
-      if (c.type == Wall)
-        return false;
-      if (c.haunted)
-        return false;
-      /*if (extra_haunted(pos)) // !
-        return false;*/
-      if (c.id != -1) {
-        Unit u = unit(c.id);
-        if (u.player == 0)
-          return false;
-        if (u.type == Witch)
-          return false;
-        if (u.type == Knight) 
-          return true;
-        if (u.type == Farmer) 
-          return true;
 
-      }
-      //int health_en;
-      //if (knighted2(pos,health_en) and 1.5*health < health_en)
-      /*if (knighted(pos) and health < 60)
-        return false;*/
-      return true;
-    }
-    else if (unitType == Witch) {
-      Cell c = cell(pos);
-      if (c.type == Wall)
-        return false;
-      if (c.id != -1) {
-        Unit u = unit(c.id);
-        if (u.player == 0)
-          return false;
-        if (u.type == Witch)
-          return false;
-        return true;
-      }
-      /*if (self_haunted(pos) > 1 and round() > 20) { // (abans self_haunted > 0) ROUND: clauissim!!! > 20 EP EP
-        return false;
-      }*/
-      /*if (self_haunted(pos) > 5 and round() <= 20) {
-        return false;
-      }*/
-      return true;
-    }
-    
-    else
-      return false;
-  }
-  
-  inline bool check_targetable_not_found(Pos pos,UnitType unitType, int health) {
-    if (unitType == Farmer) {
-    Cell c = cell(pos);
-    if (c.owner != 0)
-      return true;
-    else
-      return false;
-    }
-    else if (unitType == Knight) {
-      Cell c = cell(pos);
-      if (c.id != -1) {
-        Unit u = unit(c.id);
-        if (u.player == 0)
-          return false;
-        else {
-          if (u.type == Farmer)
-            return true;
-          else if (u.type == Knight) {
-            return true;
-           /*if (health > u.health)
-              return true;
-            else
-              return false;*/
-          }
-          else
-            return false;
-        }
-      }
-      else
-        return false;
-    }
-    else if (unitType == Witch) {
-      /*Cell c = cell(pos);
-      if (c.id != -1) {
-        Unit u = unit(c.id);
-        if (u.player == 0)
-          return false;
-        else if (u.type == Witch)
-          return false;
-        else if (u.type == Knight)
-          return true;
-        
-        //else if (u.type == Farmer)
-          //return true;
-        //else
-          //return true;
-          
-      }*/
-      /*if (round() <= 40 and other_haunted(pos) > 4)
-        return true;*/
-      /*if (round() > 40 and other_haunted(pos) > 0)
-        return true;*/
-      if (other_haunted(pos) > 0) // > = 0 ?
-        return true;
-    }
-    return false;
-  }
   
 
 
@@ -481,7 +358,7 @@ struct PLAYER_NAME : public Player {
   inline bool check_targetable(Pos pos,UnitType unitType, int health) {
     if (unitType == Farmer) {
     Cell c = cell(pos);
-    if (c.owner > 0)
+    if (c.owner != 0)
       return true;
     else
       return false;
@@ -530,8 +407,7 @@ struct PLAYER_NAME : public Player {
         return true;*/
       /*if (round() > 40 and other_haunted(pos) > 0)
         return true;*/
-      if (other_haunted(pos) > 1.5*
-other_haunted(pos)) // > = 0 ?
+      if (other_haunted(pos) > 1) // > = 0 ?
         return true;
     }
     return false;
@@ -755,7 +631,6 @@ other_haunted(pos)) // > = 0 ?
   }
 
   inline bool bfs_farmer(int id) {
-    bool first_move = true;
     Unit u = unit(id);
     if (u.type != Witch) {
       /*if (u.type == Farmer and u.health < 40) {
@@ -800,10 +675,7 @@ other_haunted(pos)) // > = 0 ?
       s_visited.insert(pos);
       q.pop();
       for(int i = 0; i < n; i++) {
-         if ((already_moved.find(pos+mov[i]) != already_moved.end() and first_move) and check_farmer_escape(pos+mov[i],unitType,u.health)) {
-        cerr << "I'm " << id << ", at " << u.pos << ", was going to evaluate " << pos+mov[i] << " but somebody else already is moving there" << endl;
-}
-        if (not(already_moved.find(pos+mov[i]) != already_moved.end() and first_move)and check_farmer(pos+mov[i],unitType,u.health)) {
+        if (check_farmer(pos+mov[i],unitType,u.health)) {
         //if (check_farmer(pos+farmer_movements[i])) {
           if (check_targetable(pos+mov[i],unitType,u.health)) {
           //if (check_targetable(pos+farmer_movements[i])) {
@@ -815,8 +687,6 @@ other_haunted(pos)) // > = 0 ?
               pos_aux = pos_dir;
               pos_dir = m[pos_dir];
             }
-             cerr << "I'm " << id << ", at " << u.pos << ", and I'm moving to " << pos_aux << endl;
-            already_moved.insert(pos_aux);
             if (u.pos+Left == pos_aux) {
               command(id,Left);
             }
@@ -855,127 +725,18 @@ other_haunted(pos)) // > = 0 ?
           }
         }
       }
-      first_move = false;
     }
     bool b;
-    b = bfs_farmer_not_found(id);
-    if (not b and u.type != Witch and extra_haunted(u.pos) or knighted(u.pos)) {
+    if (extra_haunted(u.pos) or knighted(u.pos)) {
       cerr << "YEP" << endl;
       b = bfs_escape(id);
     }
+    
+    cerr << "Sóc " << id << " a la ronda " << round() << " i sóc " << u.type << endl;
     if (not b)
       command(id,None);
-
     return false;
   }
-
-
-inline bool bfs_farmer_not_found(int id) {
-    bool first_move = true;
-    Unit u = unit(id);
-    if (u.type != Witch) {
-      /*if (u.type == Farmer and u.health < 40) {
-        command(id,None);
-        return false;
-      }*/
-      if (u.type == Knight and u.health < 20) {
-        command(id,None);
-        return false;
-      }
-    }
-    queue<Pos> q;
-    q.push(u.pos);
-
-    map<Pos,Pos> m; // path: key child, info parent
-    m.insert(make_pair(u.pos,u.pos));
-    int c = 0;
-    set<Pos> s_visited;
-    UnitType unitType = u.type;
-    int n = 0;
-    vector<Dir> mov(8);
-    if (u.type == Farmer or u.type == Witch) {
-      n = 4;
-      vector<Dir> mov_aux(n);
-      for (int i = 0; i < n; i++)
-        mov_aux[i] = farmer_movements[i];
-      vector<int> randp = random_permutation(n);
-      for (int i = 0; i < n; i++)
-        mov[randp[i]] = mov_aux[i];
-    }
-    else if (u.type == Knight) {
-      n = 8;
-      vector<int> randp = random_permutation(n);
-      for (int i = 0; i < n; i++)
-        mov[randp[i]] = farmer_movements[i];
-
-    }
-    while (not q.empty()) {
-      //if (q.size() > 6000) log(id,unitType,u.health);
-      //cerr << id << " " << q.size() << endl;
-      Pos pos = q.front(); 
-      s_visited.insert(pos);
-      q.pop();
-      for(int i = 0; i < n; i++) {
-         if ((already_moved.find(pos+mov[i]) != already_moved.end() and first_move) and check_farmer_not_found(pos+mov[i],unitType,u.health)) {
-        cerr << "I'm " << id << ", at " << u.pos << ", was going to evaluate " << pos+mov[i] << " but somebody else already is moving there" << endl;
-}
-        if (not(already_moved.find(pos+mov[i]) != already_moved.end() and first_move)and check_farmer_not_found(pos+mov[i],unitType,u.health)) {
-        //if (check_farmer(pos+farmer_movements[i])) {
-          if (check_targetable_not_found(pos+mov[i],unitType,u.health)) {
-          //if (check_targetable(pos+farmer_movements[i])) {
-            //FOUND
-            m.insert(make_pair(pos+mov[i],pos));
-            Pos pos_dir = pos+mov[i];
-            Pos pos_aux;
-            while (pos_dir != u.pos) {
-              pos_aux = pos_dir;
-              pos_dir = m[pos_dir];
-            }
-             cerr << "I'm " << id << ", at " << u.pos << ", and I'm moving to " << pos_aux << endl;
-            already_moved.insert(pos_aux);
-            if (u.pos+Left == pos_aux) {
-              command(id,Left);
-            }
-            else if (u.pos+Top == pos_aux) {
-              command(id,Top);
-            }
-            else if (u.pos+Right == pos_aux) {
-              command(id,Right);
-            }
-            else if (u.pos+Bottom == pos_aux) {
-              command(id,Bottom);
-            }
-            else if (unitType == Knight) {
-              if (u.pos+BR == pos_aux) {
-                command(id,BR);
-              }
-              else if (u.pos+RT == pos_aux) {
-                command(id,RT);
-              }
-              else if (u.pos+TL == pos_aux) {
-                command(id,TL);
-              }
-              else if (u.pos+LB == pos_aux) {
-                command(id,LB);
-              }
-            }
-            return true;
-          }
-          else {
-            // if (m.find(pos+farmer_movements[i]) == m.end()) {
-            if (s_visited.find(pos+mov[i]) == s_visited.end()) {
-              s_visited.insert(pos+mov[i]); // no necessari pels farmers, sí pels knights
-              q.push(pos+mov[i]);
-              m.insert(make_pair(pos+mov[i],pos));
-            }
-          }
-        }
-      }
-      first_move = false;
-    }
-    return false;
-  }
-
 
 
 
@@ -1011,8 +772,7 @@ inline bool bfs_farmer_not_found(int id) {
 
 
 
-  inline bool bfs_escape(int id) {
-    bool first_move = true;
+    inline bool bfs_escape(int id) {
     Unit u = unit(id);
     queue<Pos> q;
     q.push(u.pos);
@@ -1047,10 +807,7 @@ inline bool bfs_farmer_not_found(int id) {
       s_visited.insert(pos);
       q.pop();
       for(int i = 0; i < n; i++) {
-        if ((already_moved.find(pos+mov[i]) != already_moved.end() and first_move) and check_farmer_escape(pos+mov[i],unitType,u.health)) {
-        cerr << "I'm " << id << ", at " << u.pos << ", was going to evaluate " << pos+mov[i] << " but somebody else already is moving there" << endl;
-}
-        if (not(already_moved.find(pos+mov[i]) != already_moved.end() and first_move) and check_farmer_escape(pos+mov[i],unitType,u.health)) {
+        if (check_farmer_escape(pos+mov[i],unitType,u.health)) {
         //if (check_farmer(pos+farmer_movements[i])) {
           if (check_targetable_escape(pos+mov[i],unitType,u.health)) {
           //if (check_targetable(pos+farmer_movements[i])) {
@@ -1062,8 +819,6 @@ inline bool bfs_farmer_not_found(int id) {
               pos_aux = pos_dir;
               pos_dir = m[pos_dir];
             }
-            cerr << "I'm " << id << ", at " << u.pos << ", and I'm moving to " << pos_aux << endl;
-            already_moved.insert(pos_aux);
             if (u.pos+Left == pos_aux) {
               command(id,Left);
             }
@@ -1102,7 +857,6 @@ inline bool bfs_farmer_not_found(int id) {
           }
         }
       }
-      first_move = false;
     }
     return false;
   }
@@ -1129,24 +883,17 @@ inline bool bfs_farmer_not_found(int id) {
   //Dir farmer_movements[4] = {Left,Top,Right,Bottom};
   Dir farmer_movements[8] = {Left,Top,Right,Bottom,BR,RT,TL,LB};
 
-  set<Pos> already_moved;
-
   /**
    * Play method, invoked once per each round.
    */
 
   virtual void play () {
-    already_moved.clear();
     f = farmers(0);
-    for (int i = 0; i < f.size(); i++) {
+    for (int i = 0; i < f.size(); i++)
         bfs_farmer(f[i]);
-        //already_moved.clear(); // 
-}
     k = knights(0);
-    for (int i = 0; i < k.size(); i++) {
+    for (int i = 0; i < k.size(); i++)
         bfs_farmer(k[i]);
-        //already_moved.clear();
-}
     w = witches(0);
 
     /*if (round() < 5) {
@@ -1154,15 +901,8 @@ inline bool bfs_farmer_not_found(int id) {
         witch_initial_movement(w[i]);
     }
     else*/
-    for (int i = 0; i < w.size(); i++) {
+    for (int i = 0; i < w.size(); i++)
         bfs_farmer(w[i]);
-        //already_moved.clear();
-}
-    set<Pos>::iterator it;
-    cerr << round() << endl;
-    for (it = already_moved.begin(); it != already_moved.end(); it++) {
-      cerr << *it << endl;
-}
 
   }
 
