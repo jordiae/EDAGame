@@ -200,7 +200,8 @@ struct PLAYER_NAME : public Player {
   }
 
   inline bool check_possible_farmer_not_escape_min(Pos pos, int health) {
-    Cell c = cell(pos);
+    return check_possible_farmer_not_escape_max(pos,health);
+    /*Cell c = cell(pos);
     if (c.type == Wall)
       return false;
     if (c.haunted)
@@ -211,11 +212,12 @@ struct PLAYER_NAME : public Player {
       return false;
     if (knighted(pos))
       return false;
-    return true;
+    return true;*/
   }
 
   inline bool check_possible_farmer_escape(Pos pos, int health) {
-    Cell c = cell(pos);
+    return check_possible_farmer_not_escape_max(pos,health);
+    /*Cell c = cell(pos);
     if (c.type == Wall)
       return false;
     if (c.haunted)
@@ -226,7 +228,7 @@ struct PLAYER_NAME : public Player {
       return false;
     if (knighted(pos))
       return false;
-    return true;
+    return true;*/
   }
 
   inline bool check_possible_farmer_escape_failed_do_something(Pos pos, int health) {
@@ -348,7 +350,7 @@ struct PLAYER_NAME : public Player {
 
   inline bool check_targetable_farmer_not_escape_max(Pos pos, int health) {
     Cell c = cell(pos);
-    if (c.owner > 0)
+    if (c.owner != 0) // c.owner > 0
       return true;
     else
       return false;
@@ -391,7 +393,7 @@ struct PLAYER_NAME : public Player {
   }
 
   inline bool check_targetable_knight_not_escape_min(Pos pos, int health) {
-    return true;
+    check_targetable_knight_not_escape_max(pos, health);
   }
 
   inline bool check_targetable_knight_escape(Pos pos, int health) {
@@ -405,11 +407,13 @@ struct PLAYER_NAME : public Player {
   inline bool check_targetable_witch_not_escape_max(Pos pos, int health) {
     if(other_haunted(pos) > 3)
         return true;
+    else return false;
   }
 
   inline bool check_targetable_witch_not_escape_min(Pos pos, int health) {
     if(other_haunted(pos) > 0)
         return true;
+    else return false;
   }
 
 

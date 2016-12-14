@@ -14,6 +14,40 @@ AISovereignTest2.o: AISovereignTest2.cc Player.hh Info.hh Settings.hh \
  Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 AISovereignX.o: AISovereignX.cc Player.hh Info.hh Settings.hh Structs.hh \
  Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv10.o: AISovereignv10.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv11.o: AISovereignv11.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv12.o: AISovereignv12.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv12wat.o: AISovereignv12wat.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv13.o: AISovereignv13.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv14.o: AISovereignv14.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv15.o: AISovereignv15.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv16.o: AISovereignv16.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv17.o: AISovereignv17.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv18.o: AISovereignv18.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv19.o: AISovereignv19.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv20.o: AISovereignv20.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv21.o: AISovereignv21.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv22.o: AISovereignv22.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv23.o: AISovereignv23.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv24.o: AISovereignv24.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignv25.o: AISovereignv25.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 AISovereignv5.o: AISovereignv5.cc Player.hh Info.hh Settings.hh \
  Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 AISovereignv6.o: AISovereignv6.cc Player.hh Info.hh Settings.hh \
@@ -21,6 +55,8 @@ AISovereignv6.o: AISovereignv6.cc Player.hh Info.hh Settings.hh \
 AISovereignv7.o: AISovereignv7.cc Player.hh Info.hh Settings.hh \
  Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 AISovereignv9.o: AISovereignv9.cc Player.hh Info.hh Settings.hh \
+ Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
+AISovereignvXII.o: AISovereignvXII.cc Player.hh Info.hh Settings.hh \
  Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
 AISovereingv3.o: AISovereingv3.cc Player.hh Info.hh Settings.hh \
  Structs.hh Utils.hh State.hh Action.hh Random.hh Registry.hh
@@ -43,6 +79,7 @@ Utils.o: Utils.cc Utils.hh
 program.o: program.cc Player.hh Info.hh Settings.hh Structs.hh Utils.hh \
  State.hh Action.hh Random.hh Registry.hh
 stats.o: stats.cc
+stats_complex.o: stats_complex.cc
 test.o: test.cc
 test2.o: test2.cc
 test5.o: test5.cc
